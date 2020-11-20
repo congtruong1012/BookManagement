@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { BookService } from './book.service';
 import { bookDTO } from './dto/book.dto';
+import { statusDTO } from './dto/status.dto';
 import { Book } from './mock/book.mock';
 
 @Controller('book')
@@ -36,7 +37,11 @@ export class BookController {
     return this.bookService.deleteBook(_id);
   }
   @Patch(':_id')
-  setStatusPublish(@Param('_id') _id: string): Promise<any>{
+  setStatusPublish(@Param('_id') _id: string ): Promise<any>{
     return this.bookService.setStatusPublish(_id);
+  }
+  @Patch('status/:_id')
+  setStatusPublishMulti(@Param('_id') _id: string,  @Body() statusdto: statusDTO ): Promise<any>{
+    return this.bookService.setStatusPublishMulti(_id, statusdto);
   }
 }

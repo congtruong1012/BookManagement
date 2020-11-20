@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { bookDTO } from './dto/book.dto';
+import { statusDTO } from './dto/status.dto';
 import { Book } from './schema/book.schema';
 
 @Injectable()
@@ -27,7 +28,11 @@ export class BookService {
     return await this.bookModel.deleteOne({_id});
   }
   async setStatusPublish(_id: string): Promise<any>{
-    return await this.bookModel.updateOne({_id}, {published: true});
+    const {published} = await this.bookModel.findOne({_id});
+    return await this.bookModel.updateOne({_id}, {published: !published});
+  }
+  async setStatusPublishMulti(_id: string, statusdto: statusDTO): Promise<any>{
+    return await this.bookModel.updateOne({_id}, {published: statusdto.bool});
   }
   async searchBook(name: string): Promise<Book[]>{
     return await this.bookModel.find({name});

@@ -11,4 +11,4 @@ export class bookDTO {
   readonly author: string;
   @IsBoolean()
   readonly published: boolean;
-}
+} 
