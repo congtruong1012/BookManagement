@@ -29,4 +29,7 @@ export class BookService {
   async setStatusPublish(_id: string): Promise<any>{
     return await this.bookModel.updateOne({_id}, {published: true});
   }
+  async searchBook(name: string): Promise<Book[]>{
+    return await this.bookModel.find({name});
+  }
 }

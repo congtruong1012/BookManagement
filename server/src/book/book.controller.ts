@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { BookService } from './book.service';
 import { bookDTO } from './dto/book.dto';
 import { Book } from './mock/book.mock';
@@ -8,8 +8,12 @@ export class BookController {
   constructor(private readonly bookService: BookService){};
 
   @Get()
-  getAll(): Promise<Book[]>{
-    return this.bookService.getAll();
+  getAll(@Query('name') name: string): Promise<Book[]>{
+    if(name){
+      return this.bookService.searchBook(name);
+    }else{
+      return this.bookService.getAll();
+    }
   }
 
   @Get(':_id')
@@ -17,6 +21,7 @@ export class BookController {
     return this.bookService.getBookByID(_id);
   }
 
+  @UsePipes(ValidationPipe)
   @Post()
   createBook(@Body() bookdto: bookDTO): Promise<any>{
     return this.bookService.createBook(bookdto);
@@ -31,7 +36,7 @@ export class BookController {
     return this.bookService.deleteBook(_id);
   }
   @Patch(':_id')
-  async setStatusPublish(@Param('_id') _id: string): Promise<any>{
+  setStatusPublish(@Param('_id') _id: string): Promise<any>{
     return this.bookService.setStatusPublish(_id);
   }
 }
