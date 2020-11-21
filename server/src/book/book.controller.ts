@@ -9,11 +9,20 @@ export class BookController {
   constructor(private readonly bookService: BookService){};
 
   @Get()
-  getAll(@Query('name') name: string): Promise<Book[]>{
+  getAll(@Query('name') name: string, @Query('skip') skip: number, @Query('limit') limit: number ): Promise<Book[]>{
     if(name){
-      return this.bookService.searchBook(name);
+      return this.bookService.searchBook(name, Number(skip), Number(limit));
     }else{
-      return this.bookService.getAll();
+      return this.bookService.getAll(Number(skip), Number(limit));
+    }
+  }
+  @Get('count')
+  async countAll(@Query('name') name: string): Promise<Number> {
+    if(name){
+      return this.bookService.countSearcBook(name);
+    }
+    else{
+      return await this.bookService.countAll();
     }
   }
 

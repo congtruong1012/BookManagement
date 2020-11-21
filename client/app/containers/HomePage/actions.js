@@ -14,20 +14,43 @@ export function defaultAction() {
 /**
  * Get list book
  */
-export function getListBook() {
+export function getListBook(actionType) {
   return {
     type: types.GET_LIST_BOOK,
+    actionType,
   };
 }
-export function getListBookSuccess(data) {
+export function getListBookSuccess(data, actionType) {
   return {
     type: types.GET_LIST_BOOK_SUCCESS,
     data,
+    actionType,
   };
 }
-export function getListBookFailure(message) {
+export function getListBookFailure(message, actionType) {
   return {
     type: types.GET_LIST_BOOK_FAILURE,
+    message,
+    actionType,
+  };
+}
+/**
+ * Get list book
+ */
+export function getTotalBook() {
+  return {
+    type: types.GET_TOTAL_BOOK,
+  };
+}
+export function getTotalBookSuccess(data) {
+  return {
+    type: types.GET_TOTAL_BOOK_SUCCESS,
+    data,
+  };
+}
+export function getTotalBookFailure(message) {
+  return {
+    type: types.GET_TOTAL_BOOK_FAILURE,
     message,
   };
 }

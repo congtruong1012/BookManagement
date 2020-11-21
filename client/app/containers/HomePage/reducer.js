@@ -11,6 +11,7 @@ import * as types from './constants';
 export const initialState = {
   isLoading: false,
   listBook: [],
+  totalBook: 0,
   getBook: {},
   params: {
     limit: types.LIMIT,
@@ -19,6 +20,7 @@ export const initialState = {
   statusFlag: {
     isLoadingListBook: false,
     isActionOnOff: false,
+    isLoadMore: false,
   },
   log: {
     success: '',
@@ -33,15 +35,41 @@ const homePageReducer = (state = initialState, action) =>
       case types.DEFAULT_ACTION:
         break;
       case types.GET_LIST_BOOK:
-        draft.isLoading = true;
+        if (action.actionType === types.GET_LIST) {
+          draft.isLoading = true;
+        } else {
+          draft.params.offset = state.params.offset + draft.params.limit;
+          draft.statusFlag.isLoadMore = true;
+        }
         break;
       case types.GET_LIST_BOOK_SUCCESS:
-        draft.listBook = action.data;
-        draft.isLoading = false;
+        if (action.actionType === types.GET_LIST) {
+          draft.listBook = action.data;
+          draft.totalBook = action.totalBook;
+          draft.isLoading = false;
+        } else {
+          draft.params.offset = state.params.offset;
+          draft.listBook.push(...action.data);
+          draft.statusFlag.isLoadMore = false;
+        }
         break;
       case types.GET_LIST_BOOK_FAILURE:
-        draft.listBook = action.message;
-        draft.isLoading = false;
+        if (action.actionType === types.GET_LIST) {
+          draft.log.error = action.message;
+          draft.isLoading = false;
+        } else {
+          draft.params.offset = state.params.offset - draft.params.limit;
+          draft.log.error = action.message;
+          draft.statusFlag.isLoadMore = false;
+        }
+        break;
+      case types.GET_TOTAL_BOOK:
+        break;
+      case types.GET_TOTAL_BOOK_SUCCESS:
+        draft.totalBook = action.data;
+        break;
+      case types.GET_TOTAL_BOOK_FAILURE:
+        draft.log.error = action.message;
         break;
       case types.SET_PUBLISH:
         draft.statusFlag.isLoadingListBook = true;

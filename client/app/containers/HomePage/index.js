@@ -17,19 +17,33 @@ import makeSelectHomePage, {
   makeGetListBook,
   makeGetLoading,
   makeLoadingListBook,
+  makeTotalBook,
 } from './selectors';
 import reducer from './reducer';
 import saga from './saga';
-import { getListBook, setPublish, setPublishMuilti } from './actions';
-import { Box, Button, Checkbox, Switch } from '@material-ui/core';
-import { config } from './constants';
+import {
+  getListBook,
+  getTotalBook,
+  setPublish,
+  setPublishMuilti,
+} from './actions';
+import {
+  Box,
+  Button,
+  Checkbox,
+  CircularProgress,
+  Switch,
+} from '@material-ui/core';
+import { config, GET_LIST, LOAD_MORE } from './constants';
 
 export function HomePage(props) {
   const {
     listBook,
+    totalBook,
     isLoading,
     statusFlag,
     triggerListBook,
+    triggerTotalBook,
     triggerSwitch,
     triggerChangePublishMuilti,
   } = props;
@@ -69,8 +83,9 @@ export function HomePage(props) {
   };
   const isCheckedBook = id => selected.indexOf(id) !== -1;
   useEffect(() => {
-    triggerListBook();
-  }, [statusFlag.isLoadingListBook]);
+    triggerListBook(GET_LIST);
+    triggerTotalBook();
+  }, []);
   const columns = [
     {
       name: '',
@@ -172,7 +187,9 @@ export function HomePage(props) {
     setSelected([]);
   };
   return isLoading ? (
-    <Box>Loading</Box>
+    <Box>
+      <CircularProgress color="secondary" />
+    </Box>
   ) : (
     <div>
       <Helmet>
@@ -198,7 +215,9 @@ export function HomePage(props) {
           </Button>
         </Box>
         {isLoadingListBook ? (
-          <Box>Loading</Box>
+          <Box>
+            <CircularProgress color="secondary" />
+          </Box>
         ) : (
           <MUIDataTable
             title="List Book"
@@ -208,9 +227,21 @@ export function HomePage(props) {
           />
         )}
         <Box mt={5} textAlign="center">
-          <Button variant="contained" color="primary">
-            Load More
-          </Button>
+          {statusFlag.isLoadMore ? (
+            <Box>
+              <CircularProgress color="secondary" />
+            </Box>
+          ) : (
+            totalBook > listBook.length && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => triggerListBook(LOAD_MORE)}
+              >
+                Load More
+              </Button>
+            )
+          )}
         </Box>
       </Box>
     </div>
@@ -220,6 +251,7 @@ export function HomePage(props) {
 HomePage.propTypes = {
   listBook: PropTypes.array,
   isLoading: PropTypes.bool,
+  totalBook: PropTypes.number,
   triggerListBook: PropTypes.func,
   handleChangePunlishMuilti: PropTypes.func,
   statusLoading: PropTypes.object,
@@ -229,12 +261,14 @@ const mapStateToProps = createStructuredSelector({
   homePage: makeSelectHomePage(),
   isLoading: makeGetLoading(),
   listBook: makeGetListBook(),
+  totalBook: makeTotalBook(),
   statusFlag: makeLoadingListBook(),
 });
 
 function mapDispatchToProps(dispatch) {
   return {
-    triggerListBook: () => dispatch(getListBook()),
+    triggerListBook: type => dispatch(getListBook(type)),
+    triggerTotalBook: () => dispatch(getTotalBook()),
     triggerSwitch: id => dispatch(setPublish(id)),
     triggerChangePublishMuilti: (arr, bool) =>
       dispatch(setPublishMuilti(bool, arr)),

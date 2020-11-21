@@ -11,8 +11,11 @@ export class BookService {
   constructor(
     @InjectModel('Book') private readonly bookModel: Model<Book>,
   ) {}
-  async getAll(): Promise<Book[]>{
-    return await this.bookModel.find();
+  async getAll(skip: number, limit: number): Promise<Book[]>{
+    return await this.bookModel.find().skip(skip).limit(limit);
+  }
+  async countAll(): Promise<Number> {
+    return await this.bookModel.count({});
   }
   async getBookByID(_id: string): Promise<Book>{
     return await this.bookModel.findOne({_id});
@@ -34,7 +37,10 @@ export class BookService {
   async setStatusPublishMulti(_id: string, statusdto: statusDTO): Promise<any>{
     return await this.bookModel.updateOne({_id}, {published: statusdto.bool});
   }
-  async searchBook(name: string): Promise<Book[]>{
-    return await this.bookModel.find({name});
+  async searchBook(name: string, skip: number, limit: number): Promise<Book[]>{
+    return await this.bookModel.find({name}).skip(skip).limit(limit);
+  }
+  async countSearcBook(name: string): Promise<Number> {
+    return await this.bookModel.count({name});
   }
 }

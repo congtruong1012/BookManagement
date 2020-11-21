@@ -11,10 +11,11 @@ export const config = {
   viewColumns: false,
   selectableRowsHeader: false,
   selectableRowsHideCheckboxes: true,
+  pagination: false,
 };
 export const LOAD_MORE = 'LOAD_MORE';
 export const GET_LIST = 'GET_LIST';
-export const LIMIT = 1;
+export const LIMIT = 4;
 
 export const DEFAULT_ACTION = 'app/HomePage/DEFAULT_ACTION';
 
@@ -24,6 +25,12 @@ export const DEFAULT_ACTION = 'app/HomePage/DEFAULT_ACTION';
 export const GET_LIST_BOOK = 'app/HomePage/GET_LIST_BOOK';
 export const GET_LIST_BOOK_SUCCESS = 'app/HomePage/GET_LIST_BOOK_SUCCESS';
 export const GET_LIST_BOOK_FAILURE = 'app/HomePage/GET_LIST_BOOK_FAILURE';
+/**
+ * Get total book
+ */
+export const GET_TOTAL_BOOK = 'app/HomePage/GET_TOTAL_BOOK';
+export const GET_TOTAL_BOOK_SUCCESS = 'app/HomePage/GET_TOTAL_BOOK_SUCCESS';
+export const GET_TOTAL_BOOK_FAILURE = 'app/HomePage/GET_TOTAL_BOOK_FAILURE';
 /**
  * Get a book by id
  */
