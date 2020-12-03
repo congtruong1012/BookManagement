@@ -77,6 +77,10 @@ const homePageReducer = (state = initialState, action) =>
       case types.SET_PUBLISH_SUCCESS:
         draft.statusFlag.isLoadingListBook = false;
         draft.log.success = 'Change success';
+        const index = draft.listBook.findIndex(item => item._id === action.id);
+        if (index >= 0) {
+          draft.listBook[index].published = !draft.listBook[index].published;
+        }
         break;
       case types.SET_PUBLISH_FAILURE:
         draft.log.error = action.message;
@@ -88,10 +92,71 @@ const homePageReducer = (state = initialState, action) =>
       case types.SET_PUBLISH_MUILTI_SUCCESS:
         draft.log.success = 'Change success';
         draft.statusFlag.isActionOnOff = false;
+        action.arr.forEach(id => {
+          const indexM = draft.listBook.findIndex(item => item._id === id);
+          if (indexM >= 0) {
+            draft.listBook[indexM].published = action.bool;
+          }
+        });
         break;
       case types.SET_PUBLISH_MUILTI_FAILURE:
         draft.log.error = action.message;
         draft.statusFlag.isActionOnOff = false;
+        break;
+      case types.CREATE_BOOK:
+        draft.isLoading = true;
+        break;
+      case types.CREATE_BOOK_SUCCESS:
+        draft.listBook.push(action.data);
+        draft.isLoading = false;
+        break;
+      case types.CREATE_BOOK_FAILURE:
+        draft.log.error = action.message;
+        draft.isLoading = false;
+        break;
+      case types.DELETE_BOOK:
+        draft.isLoading = true;
+        break;
+      case types.DELETE_BOOK_SUCCESS:
+        const indexD = draft.listBook.findIndex(item => item._id === action.id);
+        if (indexD >= 0) {
+          draft.listBook.splice(indexD, 1);
+        }
+        draft.isLoading = false;
+        break;
+      case types.DELETE_BOOK_FAILURE:
+        draft.log.error = action.message;
+        draft.isLoading = false;
+        break;
+      case types.DELETE_MUILTI_BOOK:
+        draft.isLoading = true;
+        break;
+      case types.DELETE_MUILTI_BOOK_SUCCESS:
+        action.arr.forEach(id => {
+          const indexDM = draft.listBook.findIndex(item => item._id === id);
+          if (indexDM >= 0) {
+            draft.listBook.splice(indexDM, 1);
+          }
+        });
+        draft.isLoading = false;
+        break;
+      case types.DELETE_MUILTI_BOOK_FAILURE:
+        draft.log.error = action.message;
+        draft.isLoading = false;
+        break;
+      case types.UPDATE_BOOK:
+        draft.isLoading = true;
+        break;
+      case types.UPDATE_BOOK_SUCCESS:
+        const indexU = draft.listBook.findIndex(item => item._id === action.id);
+        if (indexU >= 0) {
+          draft.listBook[indexU] = action.data;
+        }
+        draft.isLoading = false;
+        break;
+      case types.UPDATE_BOOK_FAILURE:
+        draft.isLoading = false;
+        draft.log.error = action.message;
         break;
     }
   });

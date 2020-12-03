@@ -30,6 +30,11 @@ const makeGetListBook = () =>
     selectHomePageDomain,
     globalState => globalState.listBook,
   );
+const makeGetBook = () =>
+  createSelector(
+    selectHomePageDomain,
+    globalState => globalState.getBook,
+  );
 const makeTotalBook = () =>
   createSelector(
     selectHomePageDomain,
@@ -51,6 +56,7 @@ export {
   selectHomePageDomain,
   makeGetParams,
   makeGetListBook,
+  makeGetBook,
   makeTotalBook,
   makeGetLoading,
   makeLoadingListBook,

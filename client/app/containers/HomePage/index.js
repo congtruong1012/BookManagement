@@ -4,37 +4,48 @@
  *
  */
 
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { Helmet } from 'react-helmet';
-import { createStructuredSelector } from 'reselect';
-import { compose } from 'redux';
-import MUIDataTable from 'mui-datatables';
-import { useInjectSaga } from '../../utils/injectSaga';
-import { useInjectReducer } from '../../utils/injectReducer';
-import makeSelectHomePage, {
-  makeGetListBook,
-  makeGetLoading,
-  makeLoadingListBook,
-  makeTotalBook,
-} from './selectors';
-import reducer from './reducer';
-import saga from './saga';
-import {
-  getListBook,
-  getTotalBook,
-  setPublish,
-  setPublishMuilti,
-} from './actions';
 import {
   Box,
   Button,
   Checkbox,
   CircularProgress,
+  IconButton,
   Switch,
 } from '@material-ui/core';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import MUIDataTable from 'mui-datatables';
+import PropTypes from 'prop-types';
+import React, { memo, useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
+import { createStructuredSelector } from 'reselect';
+import ModalBook from '../../components/ModalBook';
+import { useInjectReducer } from '../../utils/injectReducer';
+import { useInjectSaga } from '../../utils/injectSaga';
+import {
+  createBook,
+  deleteBook,
+  deleteMuiltiBook,
+  getBook,
+  getListBook,
+  getTotalBook,
+  setPublish,
+  setPublishMuilti,
+  updateBook,
+} from './actions';
 import { config, GET_LIST, LOAD_MORE } from './constants';
+import reducer from './reducer';
+import saga from './saga';
+import makeSelectHomePage, {
+  makeGetBook,
+  makeGetListBook,
+  makeGetLoading,
+  makeLoadingListBook,
+  makeTotalBook,
+} from './selectors';
+import { get } from 'lodash';
 
 export function HomePage(props) {
   const {
@@ -46,10 +57,33 @@ export function HomePage(props) {
     triggerTotalBook,
     triggerSwitch,
     triggerChangePublishMuilti,
+    triggerAddBook,
+    triggerDeleteBook,
+    triggerUpdateBook,
+    triggerDeleteMuilti,
   } = props;
   const { isLoadingListBook } = statusFlag;
   useInjectReducer({ key: 'homePage', reducer });
   useInjectSaga({ key: 'homePage', saga });
+  const initState = {
+    open: false,
+    title: '',
+    book: {
+      _id: '',
+      name: '',
+      price: 0,
+      type: '',
+      author: '',
+      published: false,
+    },
+  };
+  const [info, setInfo] = useState(initState);
+  const handleOpen = () => {
+    setInfo({ ...info, open: true, title: 'Thêm mới' });
+  };
+  const handleClose = () => {
+    setInfo(initState);
+  };
   const [selected, setSelected] = useState([]);
   const checkAllBook = e => {
     if (e.target.checked) {
@@ -176,19 +210,70 @@ export function HomePage(props) {
         },
       },
     },
+    {
+      name: 'action',
+      label: 'Action',
+      options: {
+        customBodyRender: value => (
+          <React.Fragment>
+            <Box>
+              <IconButton color="primary" onClick={() => handleGetBook(value)}>
+                <EditIcon />
+              </IconButton>
+              <Box mx={1} component="span" />
+              <IconButton
+                color="primary"
+                onClick={() => {
+                  if (confirm('Do you want to delete this book')) {
+                    triggerDeleteBook(value);
+                  }
+                }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Box>
+          </React.Fragment>
+        ),
+      },
+    },
   ];
   const data = [];
   listBook.forEach((item, index) => {
     const { _id, name, price, type, author, published } = item;
-    data.push([_id, index + 1, name, price, type, author, published]);
+    data.push([_id, index + 1, name, price, type, author, published, _id]);
   });
   const handleChangePublishMuilti = (arr, bool) => {
     triggerChangePublishMuilti(arr, bool);
     setSelected([]);
   };
+  const handleDeleteMuilti = arr => {
+    if (arr.length > 0 && confirm('Do you want to delete these book')) {
+      triggerDeleteMuilti(arr);
+      setSelected([]);
+    }
+  };
+  const triggerSubmit = value => {
+    const { _id, ...rest } = value;
+    if (get(value, '_id')) {
+      triggerUpdateBook(_id, { ...rest });
+    } else {
+      triggerAddBook({ ...rest });
+    }
+  };
+  const handleGetBook = value => {
+    const { _id, name, price, type, author, published } = listBook.find(
+      item => item._id === value,
+    );
+    setInfo({
+      ...info,
+      open: true,
+      title: 'Cập nhật',
+      book: { _id, name, price, type, author, published },
+    });
+  };
   return isLoading ? (
     <Box>
-      <CircularProgress color="secondary" />
+      <CircularProgress color="primary" />
     </Box>
   ) : (
     <div>
@@ -197,21 +282,34 @@ export function HomePage(props) {
         <meta name="description" content="Description of HomePage" />
       </Helmet>
       <Box mt={20}>
-        <Box mb={2}>
-          <Button
-            onClick={() => handleChangePublishMuilti(selected, true)}
-            variant="contained"
-            color="primary"
-          >
-            On
-          </Button>
-          <Box mx={1} component="span" />
-          <Button
-            onClick={() => handleChangePublishMuilti(selected, false)}
-            variant="contained"
-            color="primary"
-          >
-            Off
+        <Box mb={2} display="flex" justifyContent="space-between">
+          <Box>
+            <Button
+              onClick={() => handleChangePublishMuilti(selected, true)}
+              variant="contained"
+              color="primary"
+            >
+              On
+            </Button>
+            <Box mx={1} component="span" />
+            <Button
+              onClick={() => handleChangePublishMuilti(selected, false)}
+              variant="contained"
+              color="primary"
+            >
+              Off
+            </Button>
+            <Box mx={1} component="span" />
+            <Button
+              onClick={() => handleDeleteMuilti(selected)}
+              variant="contained"
+              color="primary"
+            >
+              Delete
+            </Button>
+          </Box>
+          <Button color="primary" variant="contained" onClick={handleOpen}>
+            Thêm mới
           </Button>
         </Box>
         {isLoadingListBook ? (
@@ -244,6 +342,13 @@ export function HomePage(props) {
           )}
         </Box>
       </Box>
+      <Box>
+        <ModalBook
+          {...info}
+          onClose={handleClose}
+          triggerSubmit={triggerSubmit}
+        />
+      </Box>
     </div>
   );
 }
@@ -253,6 +358,11 @@ HomePage.propTypes = {
   isLoading: PropTypes.bool,
   totalBook: PropTypes.number,
   triggerListBook: PropTypes.func,
+  triggerGetBook: PropTypes.func,
+  triggerAddBook: PropTypes.func,
+  triggerDeleteBook: PropTypes.func,
+  triggerDeleteMuilti: PropTypes.func,
+  triggerUpdateBook: PropTypes.func,
   handleChangePunlishMuilti: PropTypes.func,
   statusLoading: PropTypes.object,
 };
@@ -272,6 +382,10 @@ function mapDispatchToProps(dispatch) {
     triggerSwitch: id => dispatch(setPublish(id)),
     triggerChangePublishMuilti: (arr, bool) =>
       dispatch(setPublishMuilti(bool, arr)),
+    triggerAddBook: value => dispatch(createBook(value)),
+    triggerDeleteBook: value => dispatch(deleteBook(value)),
+    triggerDeleteMuilti: arr => dispatch(deleteMuiltiBook(arr)),
+    triggerUpdateBook: (id, data) => dispatch(updateBook(id, data)),
   };
 }
 
@@ -280,4 +394,7 @@ const withConnect = connect(
   mapDispatchToProps,
 );
 
-export default compose(withConnect)(HomePage);
+export default compose(
+  withConnect,
+  memo,
+)(HomePage);

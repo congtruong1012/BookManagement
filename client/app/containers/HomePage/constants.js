@@ -56,6 +56,14 @@ export const DELETE_BOOK = 'app/HomePage/DELETE_BOOK';
 export const DELETE_BOOK_SUCCESS = 'app/HomePage/DELETE_BOOK_SUCCESS';
 export const DELETE_BOOK_FAILURE = 'app/HomePage/DELETE_BOOK_FAILURE';
 /**
+ * Delete muilti a book
+ */
+export const DELETE_MUILTI_BOOK = 'app/HomePage/DELETE_MUILTI_BOOK';
+export const DELETE_MUILTI_BOOK_SUCCESS =
+  'app/HomePage/DELETE_MUILTI_BOOK_SUCCESS';
+export const DELETE_MUILTI_BOOK_FAILURE =
+  'app/HomePage/DELETE_MUILTI_BOOK_FAILURE';
+/**
  * Filter book
  */
 export const FILTER_BOOK = 'app/HomePage/FILTER_BOOK';

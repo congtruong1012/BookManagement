@@ -84,9 +84,10 @@ export function createBook(data) {
     data,
   };
 }
-export function createBookSuccess() {
+export function createBookSuccess(data) {
   return {
     type: types.CREATE_BOOK_SUCCESS,
+    data,
   };
 }
 export function createBookFailure(message) {
@@ -105,9 +106,11 @@ export function updateBook(id, data) {
     data,
   };
 }
-export function updateBookSuccess() {
+export function updateBookSuccess(id, data) {
   return {
     type: types.UPDATE_BOOK_SUCCESS,
+    id,
+    data,
   };
 }
 export function updateBookFailure(message) {
@@ -125,14 +128,36 @@ export function deleteBook(id) {
     id,
   };
 }
-export function deleteBookSuccess() {
+export function deleteBookSuccess(id) {
   return {
     type: types.DELETE_BOOK_SUCCESS,
+    id,
   };
 }
 export function deleteBookFailure(message) {
   return {
     type: types.DELETE_BOOK_FAILURE,
+    message,
+  };
+}
+/**
+ * delete muilti book
+ */
+export function deleteMuiltiBook(arr) {
+  return {
+    type: types.DELETE_MUILTI_BOOK,
+    arr,
+  };
+}
+export function deleteMuiltiBookSuccess(arr) {
+  return {
+    type: types.DELETE_MUILTI_BOOK_SUCCESS,
+    arr,
+  };
+}
+export function deleteMuiltiBookFailure(message) {
+  return {
+    type: types.DELETE_MUILTI_BOOK_FAILURE,
     message,
   };
 }
@@ -166,9 +191,10 @@ export function setPublish(id) {
     id,
   };
 }
-export function setPublishSuccess() {
+export function setPublishSuccess(id) {
   return {
     type: types.SET_PUBLISH_SUCCESS,
+    id,
   };
 }
 export function setPublishFailure(message) {
@@ -187,9 +213,11 @@ export function setPublishMuilti(bool, arr) {
     arr,
   };
 }
-export function setPublishMuiltiSuccess() {
+export function setPublishMuiltiSuccess(bool, arr) {
   return {
     type: types.SET_PUBLISH_MUILTI_SUCCESS,
+    bool,
+    arr,
   };
 }
 export function setPublishMuiltiFailure(message) {
