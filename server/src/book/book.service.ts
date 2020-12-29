@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { bookDTO } from './dto/book.dto';
+import { statusDTO } from './dto/status.dto';
 import { Book } from './schema/book.schema';
 
 @Injectable()
@@ -10,8 +11,11 @@ export class BookService {
   constructor(
     @InjectModel('Book') private readonly bookModel: Model<Book>,
   ) {}
-  async getAll(): Promise<Book[]>{
-    return await this.bookModel.find();
+  async getAll(skip: number, limit: number): Promise<Book[]>{
+    return await this.bookModel.find().skip(skip).limit(limit);
+  }
+  async countAll(): Promise<Number> {
+    return await this.bookModel.count({});
   }
   async getBookByID(_id: string): Promise<Book>{
     return await this.bookModel.findOne({_id});
@@ -27,6 +31,16 @@ export class BookService {
     return await this.bookModel.deleteOne({_id});
   }
   async setStatusPublish(_id: string): Promise<any>{
-    return await this.bookModel.updateOne({_id}, {published: true});
+    const {published} = await this.bookModel.findOne({_id});
+    return await this.bookModel.updateOne({_id}, {published: !published});
+  }
+  async setStatusPublishMulti(_id: string, statusdto: statusDTO): Promise<any>{
+    return await this.bookModel.updateOne({_id}, {published: statusdto.bool});
+  }
+  async searchBook(name: string, skip: number, limit: number): Promise<Book[]>{
+    return await this.bookModel.find({name}).skip(skip).limit(limit);
+  }
+  async countSearcBook(name: string): Promise<Number> {
+    return await this.bookModel.count({name});
   }
 }
